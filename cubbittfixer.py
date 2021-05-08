@@ -14,16 +14,19 @@ def main():
 @app.route('/fix', methods=['POST'])
 def fix():
     default_configuration = get_default_configuration()
-    if 'src' in request.args.keys():
-        default_configuration.source_lang = FixerConfigurator.get_language(request.args, 'src')
 
-    if 'trg' in request.args.keys():
-        default_configuration.source_lang = FixerConfigurator.get_language(request.args, 'trg')
+    for key, val in default_configuration.items():
+        if isinstance(val, list) and f"{key}[]" in request.form:
+            default_configuration[key] = request.form.getlist(f"{key}[]")
+        else:
+            default_configuration[key] = request.form.get(key, val, type=type(val))
 
     src_text = request.form.get('source_text', '', type=str)
     trg_text = request.form.get('target_text', '', type=str)
 
-    fixer = Fixer(default_configuration)
+    configuration = FixerConfigurator()
+    configuration.load_from_dict(default_configuration)
+    fixer = Fixer(configuration)
     translation, _ = fixer.fix(src_text, trg_text)
 
     # there was no fix or the sentence is unfixable
@@ -39,20 +42,16 @@ def favicon():
 
 
 def get_default_configuration():
-    default_config = {
+    return {
         'source_lang': 'cs',
         'target_lang': 'en',
         'aligner': 'fast_align',
-        'lemmatizator': 'udpipe',
+        'lemmatizator': 'udpipe_online',
         'names_tagger': 'nametag',
         'mode': 'recalculating',
         'base_tolerance': 0.1,
         'approximately_tolerance': 0.1,
-        'target_units': ['Imperial', 'USD', 'F'],
-        'exchange_rates': 'cnb'
+        'target_units': ['imperial', 'USD', 'F'],
+        'exchange_rates': 'cnb',
+        'tools': ['separators', 'units']
     }
-
-    configuration = FixerConfigurator()
-    configuration.load_from_dict(default_config)
-
-    return configuration

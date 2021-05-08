@@ -2,32 +2,122 @@
 {% block title %}Web demo{% endblock %}
 
 {% block content %}
-  <div id="loader">Loading&#8230;</div>
+<div id="loader">Loading&#8230;</div>
 
-  <main class="container">
-      <h1>CUBBITT fixer - web demo</h1>
+<main class="container">
+    <h1>CUBBITT fixer - web demo</h1>
 
-      <form id="translate">
-          <div class="mb-3">
-              <label for="inputText" class="form-label">Text to translate:</label>
-              <textarea id="inputText" rows="5" class="form-control"></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary mb-3">Translate</button>
-      </form>
+    <form id="translate">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="sourceLanguage">Source language</label>
+                <select id="sourceLanguage" class="form-control">
+                    <option value="cs" selected>czech</option>
+                    <option value="en">english</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="targetLanguage">Target language</label>
+                <select id="targetLanguage" class="form-control">
+                    <option value="cs">czech</option>
+                    <option value="en" selected>english</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="inputText" class="form-label">Text to translate</label>
+            <textarea id="inputText" rows="5" class="form-control"></textarea>
+        </div>
+        <div class="form-row align-items-center justify-content-center mb-3 ">
+            <div class="col-auto form-check">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="units" checked>
+                    <label class="custom-control-label" for="units">Numbers with units</label>
+                </div>
+            </div>
+            <div class="col-auto form-check">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="separators" checked>
+                    <label class="custom-control-label" for="separators">Decimal & thousands separator</label>
+                </div>
+            </div>
+            <div class="col-auto form-check">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="names">
+                    <label class="custom-control-label" for="names">Proper names</label>
+                </div>
+            </div>
+            <div class="form-inline col-auto ">
+                <div class="form-group">
+                    <input type="number" min="0" max="100" step="1" class="form-control  mr-sm-2" id="tolerance" value="10">
+                    <label for="tolerance">Basic tolerance [%]</label>
+                </div>
+            </div>
 
-      <h2>Translations</h2>
+        </div>
+        <div class="form-row align-items-center justify-content-center mb-3 ">
+            <div class="col-auto form-check">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="recalculate">
+                    <label class="custom-control-label" for="recalculate">Recalculate numbers</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-row mb-3" id="recalculateFields">
+            <div class="form-group col-md-4">
+                <label for="distances">Distance & area & weight</label>
+                <select id="distances" class="form-control">
+                    <option value="si" selected>SI</option>
+                    <option value="imperial">IMPERIAL</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="currency">Currency</label>
+                <select id="currency" class="form-control">
+                    <option value="CZK" selected>CZK</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="temperature">Temperature</label>
+                <select id="temperature" class="form-control">
+                    <option value="C" selected>° C</option>
+                    <option value="F">° F</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row align-items-center justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" class="custom-control-input" id="proximity">
+                    <label class="custom-control-label" for="proximity">Consider proximity</label>
+                </div>
+            </div>
+            <div class="col-md-6 form-inline" >
+                <div class="form-group" id="proximityFields">
+                    <input type="number" min="0" max="100" step="1" class="form-control mr-sm-2" id="proximityTolerance" value="20">
+                    <label for="proximityTolerance">Tolerance for proximity [%]</label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-3">Translate</button>
+    </form>
 
-      <section class="mb-3">
-          <h3>Original</h3>
-          <label for="originalTranslation" class="form-label visually-hidden">Original translation:</label>
-          <textarea id="originalTranslation" rows="5" class="form-control" disabled></textarea>
-      </section>
+    <h2>Translations</h2>
 
-      <section>
-          <h3>After postprocessing</h3>
-          <label for="afterPostprocessingTranslation" class="form-label visually-hidden">Translation after post
-              processing:</label>
-          <textarea id="afterPostprocessingTranslation" rows="5" class="form-control" disabled></textarea>
-      </section>
-  </main>
+    <section class="mb-3">
+        <h3>Original</h3>
+        <label for="originalTranslation" class="form-label visually-hidden">Original translation:</label>
+        <textarea id="originalTranslation" rows="5" class="form-control" disabled></textarea>
+    </section>
+
+    <section>
+        <h3>After postprocessing</h3>
+        <label for="afterPostprocessingTranslation" class="form-label visually-hidden">Translation after post
+            processing:</label>
+        <textarea id="afterPostprocessingTranslation" rows="5" class="form-control" disabled></textarea>
+    </section>
+</main>
 {% endblock %}
