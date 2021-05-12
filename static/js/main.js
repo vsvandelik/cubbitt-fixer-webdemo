@@ -10931,6 +10931,7 @@ function translateInput(e) {
         CUBBITTFixerState.recalculatingFields.find("select").each(function (i) {
             configuration.target_units.push($(this).val());
         });
+        configuration.mode = 'recalculating';
     }
 
     if (CUBBITTFixerState.proximityToggle.prop('checked'))
@@ -10942,25 +10943,15 @@ function translateInput(e) {
     });
 
     $.post(
-        `https://lindat.mff.cuni.cz/services/translation/api/v2/languages/?src=${configuration.source_lang}&tgt=${configuration.target_lang}`,
-        {input_text: configuration.source_text}
+        `${$SCRIPT_ROOT}/fix`,
+        configuration
     ).done(function (data) {
-            $("#originalTranslation").val(data);
-
-            configuration.target_text = data;
-
-            $.post(
-                `${$SCRIPT_ROOT}/fix`,
-                configuration
-            ).done(function (data) {
-                $("#afterPostprocessingTranslation").val(data);
-            }).fail(function () {
-                $("#translate").prepend('<div class="alert alert-danger">Cannot connect to postprocessor. Please try it later.</div>');
-            });
-
-        }
-    ).fail(function () {
-        $("#translate").prepend('<div class="alert alert-danger">Cannot connect to LINDAT translation service. Please try it later.</div>');
+        console.log(data);
+        //let parsedData = jQuery.parseJSON(data);
+        $("#originalTranslation").val(data.cubbitt);
+        $("#afterPostprocessingTranslation").val(data.fixer);
+    }).fail(function () {
+        $("#translate").prepend('<div class="alert alert-danger">Cannot connect to lindat or postprocessor. Please try it later.</div>');
     }).always(function () {
         CUBBITTFixerState.loader.hide();
     });
