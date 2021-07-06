@@ -5,14 +5,26 @@ let CUBBITTFixerState = {
     recalculatingToggle: undefined,
     proximityToggle: undefined,
     sourceLanguage: undefined,
-    targetLanguage: undefined
+    targetLanguage: undefined,
+    customTranslation: undefined,
+    originalTranslation: undefined,
+    afterProcessingTranslation: undefined
 };
 
 $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+
     // Translating
     CUBBITTFixerState.loader = $("#loader");
     CUBBITTFixerState.loader.hide();
     $("#translate button[type=submit]").click(translateInput);
+
+    // Custom translation
+    CUBBITTFixerState.customTranslation = $("#customOriginalTranslation")
+        .change(swapEnableTranslationField);
+    CUBBITTFixerState.originalTranslation = $("#originalTranslation");
+    CUBBITTFixerState.afterProcessingTranslation = $("#afterPostprocessingTranslation");
+
 
     // Languages
     CUBBITTFixerState.sourceLanguage = $("#sourceLanguage")
@@ -29,6 +41,16 @@ $(function () {
 
 function changedLanguage(me, opposite) {
     opposite.prop('selectedIndex', 1 - me.prop('selectedIndex'));
+}
+
+function swapEnableTranslationField(e) {
+    if(e.target.checked)
+        CUBBITTFixerState.originalTranslation.attr('disabled', false).focus();
+    else
+        CUBBITTFixerState.originalTranslation.val("").attr('disabled', true);
+
+
+
 }
 
 function translateInput(e) {
@@ -60,14 +82,16 @@ function translateInput(e) {
             configuration.tools.push(id);
     });
 
+    if(CUBBITTFixerState.originalTranslation.val())
+        configuration.target_text = CUBBITTFixerState.originalTranslation.val();
+
     $.post(
         `${$SCRIPT_ROOT}/fix`,
         configuration
     ).done(function (data) {
-        console.log(data);
-        //let parsedData = jQuery.parseJSON(data);
-        $("#originalTranslation").val(data.cubbitt);
-        $("#afterPostprocessingTranslation").val(data.fixer);
+        if(!configuration.target_text)
+            CUBBITTFixerState.originalTranslation.val(data.cubbitt);
+        CUBBITTFixerState.afterProcessingTranslation.val(data.fixer);
     }).fail(function () {
         $("#translate").prepend('<div class="alert alert-danger">Cannot connect to lindat or postprocessor. Please try it later.</div>');
     }).always(function () {

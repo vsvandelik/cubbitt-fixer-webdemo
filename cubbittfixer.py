@@ -23,13 +23,39 @@ def fix():
         else:
             default_configuration[key] = request.form.get(key, val, type=type(val))
 
-    src_text = request.form.get('source_text', '', type=str)
-    # trg_text = request.form.get('target_text', '', type=str)
-
     configuration = FixerConfigurator()
     configuration.load_from_dict(default_configuration)
     fixer = Fixer(configuration)
 
+    src_text = request.form.get('source_text', '', type=str)
+    trg_text = request.form.get('target_text', '', type=str)
+
+    if trg_text:
+        return fix_by_given_translation(src_text, trg_text, configuration, fixer)
+    else:
+        return get_translation_and_fix(src_text, configuration, fixer)
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon/favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+def fix_by_given_translation(src_text, trg_text, configuration, fixer):
+    translation, _ = fixer.fix(src_text, trg_text)
+
+    if not translation or translation is True:
+        translation = trg_text
+
+    result = {
+        'cubbitt': None,
+        'fixer': translation
+    }
+
+    return jsonify(result)
+
+
+def get_translation_and_fix(src_text, configuration, fixer):
     source_sentences_as_list = SentencesSplitter.split_text_to_sentences(src_text, configuration.source_lang, configuration)
     source_sentences_as_lines_string = make_string_from_split_sentences(source_sentences_as_list, configuration)
     cubbitt_translation = translate_at_cubbitt(source_sentences_as_lines_string, configuration.source_lang.acronym, configuration.target_lang.acronym)
@@ -53,11 +79,6 @@ def fix():
     }
 
     return jsonify(result)
-
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon/favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 def get_default_configuration():
