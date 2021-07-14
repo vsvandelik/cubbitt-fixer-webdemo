@@ -42,14 +42,11 @@ def favicon():
 
 
 def fix_by_given_translation(src_text, trg_text, configuration, fixer):
-    translation, _ = fixer.fix(src_text, trg_text)
-
-    if not translation or translation is True:
-        translation = trg_text
+    sentence, _, _ = fixer.fix(src_text, trg_text)
 
     result = {
         'cubbitt': None,
-        'fixer': translation
+        'fixer': sentence
     }
 
     return jsonify(result)
@@ -65,10 +62,7 @@ def get_translation_and_fix(src_text, configuration, fixer):
     for original_sentences, translated_sentences in zip(source_sentences_as_list, cubbitt_translation):
         paragraph = []
         for original_text, translated_text in zip(original_sentences, translated_sentences):
-            translation, _ = fixer.fix(original_text, translated_text)
-            # there was no fix or the sentence is unfixable
-            if not translation or translation is True:
-                translation = translated_text
+            translation, _, _ = fixer.fix(original_text, translated_text)
             paragraph.append(translation)
 
         paragraphs.append(" ".join(paragraph))
